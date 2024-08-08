@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Literasi Melayu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --text-color: #4a4a4a;
+            --vowel-color: #FF6B6B;
+            --consonant-color: #4ECDC4;
+            --shadow-color: #d1d9e6;
+            --light-shadow: #ffffff;
+            --primary-color: #5352ed;
+            --active-color: #FFA500;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar nav ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar nav ul li a.active {
+            background-color: var(--active-color);
+        }
+
+        #content-area {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: var(--bg-color);
+            border-radius: 20px;
+            margin: 20px;
+            overflow-y: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .feature-cards {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            padding: 20px;
+            width: 250px;
+            box-shadow: 8px 8px 15px var(--shadow-color), -8px -8px 15px var(--light-shadow);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 12px 12px 20px var(--shadow-color), -12px -12px 20px var(--light-shadow);
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--vowel-color);
+        }
+    </style>
+</head>
+<body>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+        // Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyALJAdaTtnKJAAusivRCDnGuf3MGAVKF1I",
+            authDomain: "literasi-melayu.firebaseapp.com",
+            databaseURL: "https://literasi-melayu-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "literasi-melayu",
+            storageBucket: "literasi-melayu.appspot.com",
+            messagingSenderId: "22921231984",
+            appId: "1:22921231984:web:61f7e985004de93956feb5",
+            measurementId: "G-764KEF9MJV"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Check if user is authenticated, if not redirect to login page
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                // User is signed in, you can now show the content
+                document.querySelector('.app-container').style.display = 'flex';
+                loadContent();
+            }
+        });
+
+        // Logout function
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                // Sign-out successful.
+                window.location.href = 'login.html';
+            }).catch((error) => {
+                // An error happened.
+                console.error('Logout Error:', error);
+            });
+        }
+
+        // Load content based on URL
+        function loadContent() {
+            const path = window.location.hash.substring(1);
+            const contentArea = document.getElementById('content-area');
+            
+            console.log('Loading content for path:', path); // Debug log
+
+            switch(path) {
+                case 'vowels':
+                    console.log('Attempting to fetch vowels.html'); // Debug log
+                    fetch('pages/vowels.html')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.text();
+                        })
+                        .then(html => {
+                            contentArea.innerHTML = html;
+                            console.log('Vowels content loaded successfully'); // Debug log
+                        })
+                        .catch(error => {
+                            console.error('Error loading vowels content:', error);
+                            contentArea.innerHTML = `<p>Error loading content. Please try again. Details: ${error.message}</p>`;
+                        });
+                    break;
+                case 'huruf':
+                    console.log('Attempting to fetch huruf.html'); // Debug log
+                    fetch('pages/huruf.html')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.text();
+                        })
+                        .then(html => {
+                            contentArea.innerHTML = html;
+                            console.log('Huruf content loaded successfully'); // Debug log
+                        })
+                        .catch(error => {
+                            console.error('Error loading huruf content:', error);
+                            contentArea.innerHTML = `<p>Error loading content. Please try again. Details: ${error.message}</p>`;
+                        });
+                    break;
+                case 'suku-kata':
+                    console.log('Attempting to fetch suku-kata.html'); // Debug log
+                    fetch('pages/suku-kata.html')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.text();
+                        })
+                        .then(html => {
+                            contentArea.innerHTML = html;
+                            console.log('Suku-kata content loaded successfully'); // Debug log
+                        })
+                        .catch(error => {
+                            console.error('Error loading suku-kata content:', error);
+                            contentArea.innerHTML = `<p>Error loading content. Please try again. Details: ${error.message}</p>`;
+                        });
+                    break;
+                default:
+                    console.log('Loading default content'); // Debug log
+                    contentArea.innerHTML = `
+                        <h1>Selamat Datang!</h1>
+                        <p>Pilih bahan pembelajaran untuk teruskan!</p>
+                        <div class="feature-cards">
+                            <div class="card">
+                                <h3>Kenali Vokal</h3>
+                                <p>Mengetahui dan memahami huruf vokal.</p>
+                                <a href="#vowels" class="btn">Explore Vowels</a>
+                            </div>
+                            <div class="card">
+                                <h3>Belajar Huruf</h3>
+                                <p>Bermulalah dengan asas Bahasa Melayu</p>
+                                <a href="#huruf" class="btn">Start Learning</a>
+                            </div>
+                            <div class="card">
+                                <h3>Mengenal Suku Kata</h3>
+                                <p>Jom belajar suku kata.</p>
+                                <a href="#suku-kata" class="btn">Learn Syllables</a>
+                            </div>
+                        </div>
+                    `;
+                    console.log('Default content loaded'); // Debug log
+            }
+        }
+
+        // Listen for hash changes
+        window.addEventListener('hashchange', loadContent);
+    </script>
+
+    <div class="app-container" style="display: none;">
+        <aside class="sidebar">
+            <h2>Literasi Melayu</h2>
+            <nav>
+                <ul>
+                    <li><a href="#" id="home-link">Home</a></li>
+                    <li><a href="#vowels" id="vowels-link">Vowels</a></li>
+                    <li><a href="#huruf" id="huruf-link">Kenal Huruf</a></li>
+                    <li><a href="#suku-kata" id="suku-kata-link">Kenal Suku Kata</a></li>
+                    <li><a href="#" onclick="logout()">Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main id="content-area">
+            <!-- Content will be loaded here -->
+        </main>
+    </div>
+</body>
+</html>
